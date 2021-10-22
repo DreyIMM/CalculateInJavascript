@@ -8,7 +8,7 @@ class CalcControler{
         this._timeE1 = document.querySelector("#hora");
         this._currentDate;
         this.initialize();
-        this.initButtonsEvents()
+        this.initButtonsEvents();
     }
 
 
@@ -23,6 +23,14 @@ class CalcControler{
         }, 1000);
     }
 
+    getLastOperation(){
+    
+        return this._operation[this._operation.length - 1];
+    
+    }
+  
+
+    // Está funcão permite que o evento EventListener suporte mais de um evento. (No caso o events é enviado um array, e depois tratado)
     addEventListenerAll(element, events, fn){
 
         events.split(' ').forEach(event =>{
@@ -32,24 +40,85 @@ class CalcControler{
         })
 
     }
-    // Está funcão permite que o evento EventListener suporte mais de um evento. (No caso o events é enviado um array, e depois tratado)
+     
 
-    setError(){
-        this.displayCal = "Error "
+    pushOperation(value){
+        this._operation.push(value)
+
+        if(this._operation.length >3){
+
+            this.calc();
+
+        }
+
     }
 
-    clearAll(){
-        this._operation = []
+    calc(){
+        let last = this._operation.pop();
+
+        let result = eval(this._operation.join(""));
+        
+        this._operation = [result, last];
+
+        this.setLastNumberToDisplay();
     }
 
-    clearEntry(){
-        this._operation.pop()
+    setLastNumberToDisplay(){
+    
+        let lastNumber;
+
+        for(let i = this._operation.length -1; i>=0; i--){
+            if(!this.isOperation(this._operation[i])){
+                lastNumber = this._operation[i];
+                break;
+            }
+        }
+
+        this.displayCal = lastNumber;
+
     }
 
     addOperation(value){
-        this._operation.push(value)
-        console.log(this._operation)
+        // console.log("A" , value, isNaN(this.getLastOperation()))
+    
+        
+        if(isNaN(this.getLastOperation())){
+            //String
 
+            if(this.isOperation(value)){
+                //Trocar operador
+
+                this.setlastOperation(value);
+                
+            }else if(isNaN(value)){
+                //Outra coisa
+               console.log("Outra coisa= " ,value)
+            }else{
+
+                this.pushOperation(value)
+                this.setLastNumberToDisplay()
+            }
+
+        }else{
+            //Se o this.getLasOperation é um Number
+
+            if(this.isOperation(value)){
+
+                this.pushOperation(value)
+
+            }else{
+
+                let newValue = this.getLastOperation().toString() + value.toString();
+                this.setlastOperation(parseInt(newValue));
+
+                //Atualizar display
+
+                this.setLastNumberToDisplay()
+
+
+            }           
+        }
+        
     }
 
 
@@ -65,24 +134,27 @@ class CalcControler{
                 this.clearEntry();
                 break;
             case "soma":
-                
+                this.addOperation("+");
                 break;
             case "subtracao":
-                
+                this.addOperation("-");
                 break;
             case "divisao":
-                
+                this.addOperation("/");
                 break;
             case "multiplicacao":
-               
+                this.addOperation("*");
                 break;
             case "porcento":
-                
+                this.addOperation("%");
                 break;
             case "igual":
                
                 break;
-            case' 0':
+            case "ponto":
+                this.addOperation(".");
+                break;
+            case '0':
             case '1':
             case '2':
             case '3':
@@ -100,7 +172,7 @@ class CalcControler{
         }
     }
 
-
+    // metodo para incializar os buttons. 
     initButtonsEvents(){
         let buttons = document.querySelectorAll("#buttons > g, #parts >g");
 
@@ -119,8 +191,30 @@ class CalcControler{
 
         })
     }
+    
 
-    // metodo para incializar os buttons. 
+    setError(){
+        this.displayCal = "Error "
+    }
+
+    clearAll(){
+        this._operation = []
+    }
+
+    clearEntry(){
+        this._operation.pop()
+    }
+
+    setlastOperation(value){
+        this._operation[this._operation.length - 1] = value;
+    }
+
+    isOperation(value){
+
+        return (["+" , "-", "%", "*" ,"/"].indexOf(value) > -1)
+           
+
+    }
 
     setDisplayDateTime(){
         this.displayDate = this.currentDate.toLocaleDateString(this._locale);
