@@ -1,6 +1,11 @@
 class CalcControler{
 
     constructor(){
+
+        this._lastOperator = '';
+        this._lastNumber = '';
+
+
         this._operation = [];
         this._locale = 'pt-BR';
         this._displayCalcE1 = document.querySelector("#display");
@@ -54,14 +59,42 @@ class CalcControler{
 
     }
 
+    getResult(){
+      
+        return eval(this._operation.join(""));
+
+    }
+
+
     calc(){
+
         let last = '';
-        if(this._operation.length > 3){
-            last = this._operation.pop();
+
+        this._lastOperator = this.getLastItem()
+        
+        if(this._operation.length < 3){
+
+            let fristItem = this._operation[0];
+            this._operation = [fristItem, this._lastOperator, this._lastNumber];
+
         }
 
+
+        if(this._operation.length > 3){   
+
+            last = this._operation.pop();
+            this._lastNumber = this.getResult();
+
+        }else if(this._operation.length == 3){
+            
+            this._lastNumber = this.getLastItem(false);
+        }
+
+        console.log("Ultimo operador " , this._lastOperator);
+        console.log("Ultimo numero", this._lastNumber);
+
+        let result = this.getResult();
         
-        let result = eval(this._operation.join(""));
 
         if(last == '%'){
 
@@ -80,17 +113,30 @@ class CalcControler{
         this.setLastNumberToDisplay();
     }
 
-    setLastNumberToDisplay(){
-    
-        let lastNumber;
+    getLastItem(isOperador = true){
 
+        let lastItem;
         for(let i = this._operation.length -1; i>=0; i--){
-            if(!this.isOperation(this._operation[i])){
-                lastNumber = this._operation[i];
-                break;
+         
+            if(this.isOperation(this._operation[i]) == isOperador){
+                    lastItem = this._operation[i];
+                    break;
             }
+          
         }
 
+        if(!lastItem){
+            lastItem = (isOperador) ? this._lastOperator : this._lastNumber;
+        }
+
+        return lastItem;
+    }
+
+    setLastNumberToDisplay(){
+    
+        let lastNumber = this.getLastItem(false);
+        
+        
         if(!lastNumber) lastNumber = 0 ;
 
         this.displayCal = lastNumber;
@@ -144,7 +190,7 @@ class CalcControler{
 
     execBtn(value){
 
-        switch (value) {
+        switch(value) {
 
             case "ac":
                 this.clearAll();
@@ -231,10 +277,8 @@ class CalcControler{
     }
 
     isOperation(value){
-
         return (["+" , "-", "%", "*" ,"/"].indexOf(value) > -1)
            
-
     }
 
     setDisplayDateTime(){
