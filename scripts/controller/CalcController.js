@@ -1,10 +1,11 @@
 class CalcControler{
 
     constructor(){
-
+        this._audio = new Audio('click.mp3')
         this._lastOperator = '';
         this._lastNumber = '';
 
+        this._audioOnOff = false;
 
         this._operation = [];
         this._locale = 'pt-BR';
@@ -19,6 +20,8 @@ class CalcControler{
     }
 
 
+   
+
     initialize(){
         
         this.setDisplayDateTime();
@@ -30,8 +33,45 @@ class CalcControler{
         }, 1000);
         this.setLastNumberToDisplay();
         this.pastFromClipboard();
+       
+        document.querySelectorAll(".btn-ac").forEach(btn =>{
+            
+            btn.addEventListener('dblclick', e=>{
+              
+                this.toggleAudio();
+
+            })
+
+        })
     }
 
+    toggleAudio(){
+
+
+
+        this._audioOnOff = !this._audioOnOff;
+        // Utiliza-se o de cima para diminuir o codigo
+        // if(this._audioOnOff){
+
+        //     this._audioOnOff = false
+        
+        // }else{
+
+        //     this._audioOnOff = true;
+        
+        // }
+
+    }
+
+    playAudio(){
+        if(this._audioOnOff){
+            this._audio.currentTime =0;
+            this._audio.play()
+            
+        }
+       
+       
+    }
 
     //Esse metodo permite que o contéudo dentro do disPlayCalc seja copiado para o contr c do computador, e remove o input inserido
     copyToClipboard(){
@@ -59,7 +99,7 @@ class CalcControler{
 
     initKeyboard(){
         document.addEventListener('keyup', e=>{
-                        
+            this.playAudio();                
             switch (e.key) {
               case "Escape":
                 this.clearAll();
@@ -134,9 +174,13 @@ class CalcControler{
     }
 
     getResult(){
-      
-        return eval(this._operation.join(""));
-
+        try {
+          return eval(this._operation.join(""));
+        } catch {
+          setTimeout(() => {
+            this.setError();
+          }, 1);
+        }  
     }
 
 
@@ -284,6 +328,8 @@ class CalcControler{
 
     execBtn(value){
 
+        this.playAudio();
+
         switch(value) {
 
             case "ac":
@@ -404,6 +450,10 @@ class CalcControler{
     }
 
     set displayCal(value){
+        if(value.toString().length > 10){
+            this.setError();
+            return false;
+        }
         this._displayCalcE1.innerHTML = value;
     }
 
