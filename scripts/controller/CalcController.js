@@ -14,6 +14,7 @@ class CalcControler{
         this._currentDate;
         this.initialize();
         this.initButtonsEvents();
+
     }
 
 
@@ -174,7 +175,7 @@ class CalcControler{
             }else{
 
                 let newValue = this.getLastOperation().toString() + value.toString();
-                this.setlastOperation(parseInt(newValue));
+                this.setlastOperation(parseFloat(newValue));
 
                 //Atualizar display
 
@@ -185,8 +186,25 @@ class CalcControler{
         }
         
     }
+    //Esta função permite adicionar o dot(.) para operação
+    addDot(){
+        
+    let lastOperation = this.getLastOperation();
+
+       if( this.isOperation(lastOperation) || !lastOperation){
+
+           this.pushOperation('0.');
+           
+       }else{
+
+           this.setlastOperation(lastOperation.toString() + '.')
+      
+        }
+
+       this.setLastNumberToDisplay();
 
 
+    }
 
     execBtn(value){
 
@@ -217,7 +235,7 @@ class CalcControler{
                 this.calc();
                 break;
             case "ponto":
-                this.addOperation(".");
+                this.addDot(".");
                 break;
             case '0':
             case '1':
