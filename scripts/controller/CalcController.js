@@ -15,6 +15,7 @@ class CalcControler{
         this.initialize();
         this.initButtonsEvents();
         this.initKeyboard();
+        
     }
 
 
@@ -28,6 +29,32 @@ class CalcControler{
 
         }, 1000);
         this.setLastNumberToDisplay();
+        this.pastFromClipboard();
+    }
+
+
+    //Esse metodo permite que o contéudo dentro do disPlayCalc seja copiado para o contr c do computador, e remove o input inserido
+    copyToClipboard(){
+        let input = document.createElement('input');
+        input.value = this.displayCal;
+
+        document.body.appendChild(input);
+
+        input.select();
+
+        document.execCommand("Copy");
+
+        input.remove();
+    }
+
+    // Esse metodo permite que o usuario cole, event "PASTE" numeros (int e float e envie direito para o displayCalc)
+    pastFromClipboard(){
+
+        document.addEventListener('paste', e=>{
+           
+            let text = e.clipboardData.getData('Text')
+            this.displayCal = parseFloat(text)
+        })
     }
 
     initKeyboard(){
@@ -67,7 +94,9 @@ class CalcControler{
               case "9":
                 this.addOperation(parseInt(e.key));
                 break;
-              
+              case "c":
+                  if(e.ctrlKey) this.copyToClipboard();
+                break;
             }
         
         })
